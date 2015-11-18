@@ -16,7 +16,7 @@ The following **required** functionality is completed:
 * [x] User can **persist todo items** and retrieve them properly on app restart
 
 The following **optional** features are implemented:
-
+* [x] Tweak the style improving the UI / UX, play with colors, images or backgrounds
 
 
 
