@@ -5,7 +5,7 @@
 
 Submitted by: **Ramit Bedi**
 
-Time spent: **2.5** hours spent in total
+Time spent: **4.5** hours spent in total
 
 ## User Stories
 
@@ -17,6 +17,7 @@ The following **required** functionality is completed:
 
 The following **optional** features are implemented:
 * [x] Tweak the style improving the UI / UX, play with colors, images or backgrounds
+* [x] Persist the todo items [into SQLite](http://guides.codepath.com/android/Persisting-Data-to-the-Device#sqlite) instead of a text file
 
 
 
