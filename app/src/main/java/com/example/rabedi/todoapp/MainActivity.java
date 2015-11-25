@@ -2,6 +2,7 @@ package com.example.rabedi.todoapp;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,11 +15,14 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+;
+
 public class MainActivity extends AppCompatActivity {
     private List<Item> items;
     private ArrayAdapter<Item> itemsAdapter;
     private ListView lvItems;
     private final int REQUEST_CODE = 1;
+    private final static String DIALOG = "deleteFragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     // Attaches a long click listener to the listview
     private void setupListViewListener() {
         final SQLiteHelper sQLhelper=SQLiteHelper.getInstance(this);
+
         lvItems.setOnItemLongClickListener(
                 new AdapterView.OnItemLongClickListener() {
                     @Override
@@ -75,7 +80,9 @@ public class MainActivity extends AppCompatActivity {
 
                         Item currentItem=items.get(pos);
                         sQLhelper.deleteItem(currentItem);
-
+                        FragmentManager manager = getSupportFragmentManager();
+                        DeleteDialogueFragment dialog = new DeleteDialogueFragment();
+                        dialog.show(manager, DIALOG);
                         items.remove(pos);
                         // Refresh the adapter
                         itemsAdapter.notifyDataSetChanged();
