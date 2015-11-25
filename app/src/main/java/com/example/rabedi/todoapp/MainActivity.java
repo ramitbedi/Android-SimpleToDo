@@ -11,15 +11,12 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private ArrayList<String> items;
-    private ArrayAdapter<String> itemsAdapter;
+    private List<Item> items;
+    private ArrayAdapter<Item> itemsAdapter;
     private ListView lvItems;
     private final int REQUEST_CODE = 1;
 
@@ -27,10 +24,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        readItems();
+        items = new ArrayList<Item>();
+        readItemsFromDB();
         lvItems = (ListView) findViewById(R.id.lvItems);
-       // items = new ArrayList<String>();
-        itemsAdapter = new ArrayAdapter<String>(this,
+
+        itemsAdapter = new ArrayAdapter<Item>(this,
                 android.R.layout.simple_list_item_1, items);
         lvItems.setAdapter(itemsAdapter);
         // Setup remove listener method call
@@ -62,23 +60,26 @@ public class MainActivity extends AppCompatActivity {
     public void onAddItem(View v) {
         EditText etNewItem = (EditText) findViewById(R.id.etEditText);
         String itemText = etNewItem.getText().toString();
-        itemsAdapter.add(itemText);
+        itemsAdapter.add(writeItemsToDB(itemText));
         etNewItem.setText("");
-        writeItems();
     }
 
     // Attaches a long click listener to the listview
     private void setupListViewListener() {
+        final SQLiteHelper sQLhelper=SQLiteHelper.getInstance(this);
         lvItems.setOnItemLongClickListener(
                 new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> adapter,
                                                    View item, int pos, long id) {
-                        // Remove the item within array at position
+
+                        Item currentItem=items.get(pos);
+                        sQLhelper.deleteItem(currentItem);
+
                         items.remove(pos);
                         // Refresh the adapter
                         itemsAdapter.notifyDataSetChanged();
-                        writeItems();
+                        //writeItems();
                         // Return true consumes the long click event (marks it handled)
                         return true;
                     }
@@ -89,15 +90,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapter, View item, int pos, long id) {
                 Intent intent = new Intent(MainActivity.this, EditItemActivity.class);
-                intent.putExtra("item", items.get(pos));
-                intent.putExtra("itemPos", String.valueOf(pos));
+                intent.putExtra("item", items.get(pos).toString());
+                intent.putExtra("itemPos", pos);
                 startActivityForResult(intent, REQUEST_CODE);
             }
         });
 
     }
 
-    private void readItems() {
+    private void readItemsFromDB(){
+        SQLiteHelper sQLhelper=SQLiteHelper.getInstance(this);
+        List<Item> itemList=sQLhelper.getAllItems();
+        if(itemList!=null){
+            items.addAll(itemList);
+        }
+    }
+
+   /* private void readItems() {
         File filesDir = getFilesDir();
         File todoFile = new File(filesDir, "todo.txt");
         try {
@@ -105,9 +114,18 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             items = new ArrayList<String>();
         }
+    }*/
+
+    private Item writeItemsToDB(String itemtext){
+        SQLiteHelper dbhelper=SQLiteHelper.getInstance(this);
+        int nextInt=items.size();
+        Item item=dbhelper.createItem(itemtext);
+        return item;
+
+
     }
 
-    private void writeItems() {
+    /*private void writeItems() {
         File filesDir = getFilesDir();
         File todoFile = new File(filesDir, "todo.txt");
         try {
@@ -115,17 +133,23 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent editItem) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-            String item = editItem.getExtras().getString("item");
-            int itemPos = Integer.parseInt(editItem.getExtras().getString("itemPos"));
-            items.set(itemPos, item);
-            itemsAdapter.notifyDataSetChanged();
-            writeItems();
-
+            final SQLiteHelper dbhelper=SQLiteHelper.getInstance(this);
+            String itemtext = editItem.getExtras().getString("item");
+            //int itemPos = Integer.parseInt(editItem.getExtras().getString("itemPos"));
+            int pos = editItem.getExtras().getInt("itemPos");
+            if(pos > -1) {
+                Item item=items.get(pos);
+                item.setText(itemtext);
+                items.set(pos, item);
+                dbhelper.updateItem(item);
+                itemsAdapter.notifyDataSetChanged();
+               // writeItems();
+            }
         }
     }
 }

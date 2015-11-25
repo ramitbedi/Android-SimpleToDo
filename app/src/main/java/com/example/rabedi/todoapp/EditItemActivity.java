@@ -12,6 +12,7 @@ public class EditItemActivity extends AppCompatActivity {
 
     private EditText editTodoItem;
     private Button saveButton;
+    private int itemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +20,7 @@ public class EditItemActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_item);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        itemId = getIntent().getIntExtra("itemPos",-1);
 
       /*  saveButton = (Button) findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -39,7 +41,7 @@ public class EditItemActivity extends AppCompatActivity {
     public void onItemSaveEvent(View view) {
         Intent item = new Intent();
         item.putExtra("item",editTodoItem.getText().toString());
-        item.putExtra("itemPos", getIntent().getStringExtra("itemPos"));
+        item.putExtra("itemPos", itemId);
         setResult(RESULT_OK,item);
         finish();
     }
