@@ -17,7 +17,8 @@ The following **required** functionality is completed:
 
 The following **optional** features are implemented:
 * [x] Tweak the style improving the UI / UX, play with colors, images or backgrounds
-* [x] Persist the todo items [into SQLite](http://guides.codepath.com/android/Persisting-Data-to-the-Device#sqlite) instead of a text file
+* [x] Added a delete confirmation alert style dialogue
+* [x] Persist the todo items [into SQLite](http://www.vogella.com/tutorials/AndroidSQLite/article.html) using the SqlLiteHelper instead of a text file
 
 
 
